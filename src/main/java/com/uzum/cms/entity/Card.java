@@ -1,6 +1,8 @@
 package com.uzum.cms.entity;
 
+import com.uzum.cms.constant.enums.CardType;
 import com.uzum.cms.constant.enums.Status;
+import com.uzum.cms.constant.enums.UserType;
 import com.uzum.cms.dto.response.CardDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,5 +46,17 @@ public class Card extends BaseEntity{
     @Column(name = "status", nullable = false, length = 20)
     private Status status;
 
+    @Column(name = "account_number", nullable = false, unique = true)
+    private Long accountNumber;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "card_type", length = 20)
+    private CardType cardType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_type", length = 20)
+    private UserType userType;
+
+    @Column(name = "token")
+    private String token;
 }
