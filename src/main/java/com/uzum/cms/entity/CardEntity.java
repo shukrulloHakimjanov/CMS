@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Card extends BaseEntity {
+public class CardEntity extends BaseEntity {
 
     @Column(name = "account_id", nullable = false)
     private Long accountId;
@@ -45,7 +45,7 @@ public class Card extends BaseEntity {
     @Column(name = "user_type", length = 20)
     private UserType userType;
 
-    @Column(name = "pin", length = 255)
+    @Column(name = "pin", length = 4)
     private String pin;
 
     @Column(name = "ccv", length = 4)

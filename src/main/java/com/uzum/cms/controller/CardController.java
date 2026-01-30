@@ -1,5 +1,6 @@
 package com.uzum.cms.controller;
 
+import com.uzum.cms.dto.PageRequestDto;
 import com.uzum.cms.dto.request.CardRequest;
 import com.uzum.cms.dto.request.UpdateCardStatus;
 import com.uzum.cms.dto.response.CardResponse;
@@ -9,11 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static com.uzum.cms.constant.Constant.CARD_API;
 
@@ -48,7 +48,11 @@ public class CardController {
 
     @Operation(summary = "Get all cards for a user")
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<CardResponse>> getCardsByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(cardService.getCardByUserId(userId));
+    public ResponseEntity<Page<CardResponse>> getCardsByUserId(
+            @PathVariable Long userId,
+            PageRequestDto pageRequest
+    ) {
+        return ResponseEntity.ok(cardService.getCardsByUserId(userId, pageRequest));
     }
+
 }

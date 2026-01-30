@@ -4,6 +4,7 @@ import com.uzum.cms.constant.enums.CardType;
 import com.uzum.cms.constant.enums.UserType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record CardRequest(
@@ -24,8 +25,9 @@ public record CardRequest(
         @NotNull(message = "Card type cannot be null")
         UserType userType,
 
-        @NotBlank(message = "Pin cannot be blank")
-        @Size(max = 4, message = "Pin must be 4 symbols")
+        @NotBlank(message = "PIN cannot be blank")
+        @Pattern(regexp = "\\d{4}", message = "PIN must be exactly 4 digits")
         String pin
+
 ){
 }

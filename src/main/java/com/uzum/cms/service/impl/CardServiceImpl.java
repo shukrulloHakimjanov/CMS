@@ -1,10 +1,11 @@
 package com.uzum.cms.service.impl;
 
 import com.uzum.cms.constant.enums.Status;
+import com.uzum.cms.dto.PageRequestDto;
 import com.uzum.cms.dto.request.CardRequest;
 import com.uzum.cms.dto.request.UpdateCardStatus;
 import com.uzum.cms.dto.response.CardResponse;
-import com.uzum.cms.entity.Card;
+import com.uzum.cms.entity.CardEntity;
 import com.uzum.cms.exception.CardNotFoundException;
 import com.uzum.cms.mapper.CardMapper;
 import com.uzum.cms.repository.CardRepository;
@@ -12,11 +13,12 @@ import com.uzum.cms.service.CardService;
 import com.uzum.cms.utility.UtilitiesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 
 
 @Service
@@ -31,20 +33,19 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public CardResponse createCard(CardRequest request) {
+        CardEntity cardEntity = cardMapper.toEntity(request);
 
-        Card card = cardMapper.toEntity(request);
+        String cardNumber = utilitiesService.generateCardNumber();
 
-        String fullCardNumber = utilitiesService.generateCardNumber(); // 0820XXXXXXXXXXXX
-        card.setCardNumber(fullCardNumber);
-        card.setToken(utilitiesService.generateToken(fullCardNumber));
-        card.setExpiryDate(LocalDate.now().plusYears(10));
-        card.setStatus(Status.ACTIVE);
-        card.setCcv(utilitiesService.generateCcv());
+        cardEntity.setCardNumber(cardNumber);
+        cardEntity.setToken(utilitiesService.generateToken(cardNumber));
+        cardEntity.setExpiryDate(LocalDate.now().plusYears(10));
+        cardEntity.setStatus(Status.ACTIVE);
+        cardEntity.setCcv(utilitiesService.generateCcv());
 
-        Card savedCard = cardRepository.save(card);
-        log.info("Card created with ID {}", savedCard.getId());
+        CardEntity saved = cardRepository.save(cardEntity);
 
-        return cardMapper.toDto(savedCard);
+        return cardMapper.toDto(saved);
     }
 
     @Override
@@ -58,26 +59,28 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CardResponse> getCardByUserId(Long userId) {
-        List<Card> cards = cardRepository.findAllByUserId(userId);
-        if (cards.isEmpty()) {
+    public Page<CardResponse> getCardsByUserId(Long userId, PageRequestDto pageRequest) {
+        Pageable pageable = pageRequest.getPageable();
+
+        Page<CardEntity> cardsPage = cardRepository.findAllByUserId(userId, pageable);
+
+        if (cardsPage.isEmpty()) {
             throw new CardNotFoundException("No cards found for user with ID " + userId);
         }
-        return cards.stream()
-                .map(cardMapper::toDto)
-                .toList();
+
+        return cardsPage.map(cardMapper::toDto);
     }
 
     @Override
     @Transactional
     public CardResponse updateCardStatus(Long cardId, UpdateCardStatus request) {
-        Card card = cardRepository.findById(cardId)
+        CardEntity cardEntity = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException("Card not found"));
 
-        card.setStatus(request.status());
-        Card updatedCard = cardRepository.save(card);
+        cardEntity.setStatus(request.status());
+        CardEntity updatedCardEntity = cardRepository.save(cardEntity);
 
-        log.info("Card ID {} status updated to {}", updatedCard.getId(), updatedCard.getStatus());
-        return cardMapper.toDto(updatedCard);
+        log.info("Card ID {} status updated to {}", updatedCardEntity.getId(), updatedCardEntity.getStatus());
+        return cardMapper.toDto(updatedCardEntity);
     }
 }

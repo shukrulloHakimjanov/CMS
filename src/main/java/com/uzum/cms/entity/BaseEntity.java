@@ -29,7 +29,7 @@ public class BaseEntity {
     LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = "updated_at", insertable = false)
+    @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
     @Builder.Default
