@@ -1,20 +1,22 @@
 package com.uzum.cms.mapper;
 
 
-import com.uzum.cms.dto.request.CreateCardRequest;
-import com.uzum.cms.dto.response.CardDto;
-import com.uzum.cms.entity.Card;
-import org.mapstruct.*;
+import com.uzum.cms.dto.request.CardRequest;
+import com.uzum.cms.dto.response.CardResponse;
+import com.uzum.cms.entity.CardEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CardMapper {
 
-    CardDto toDto(Card card);
-
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "cardHash", ignore = true)
-    @Mapping(target="cardNumberMasked",ignore = true)
+    @Mapping(target = "cardNumber", ignore = true)
+    @Mapping(target = "token", ignore = true)
+    @Mapping(target = "expiryDate", ignore = true)
     @Mapping(target = "status", ignore = true)
-    Card toEntity(CreateCardRequest request);
+    @Mapping(target = "ccv", ignore = true)
+    CardEntity toEntity(CardRequest request);
 
+    CardResponse toDto(CardEntity entity);
 }

@@ -1,14 +1,15 @@
 package com.uzum.cms.repository;
 
-import com.uzum.cms.entity.Card;
+import com.uzum.cms.entity.CardEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 
-public interface CardRepository extends JpaRepository<Card, Long> {
-    Optional<Card> findByUserId(Long userId);
+public interface CardRepository extends JpaRepository<CardEntity, Long> {
+    Optional<CardEntity> findByUserId(Long userId);
 
-    List<Card> findAllByUserId(Long userId);
+    Page<CardEntity> findAllByUserId(Long userId, Pageable pageable);
 }

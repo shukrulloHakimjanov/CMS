@@ -1,23 +1,25 @@
 package com.uzum.cms.service.impl;
 
 import com.uzum.cms.constant.enums.Status;
-
-import com.uzum.cms.dto.request.CreateCardRequest;
-import com.uzum.cms.dto.response.CardDto;
-import com.uzum.cms.entity.Card;
-import com.uzum.cms.exception.CardNonValidException;
+import com.uzum.cms.dto.PageRequestDto;
+import com.uzum.cms.dto.request.CardRequest;
+import com.uzum.cms.dto.request.UpdateCardStatus;
+import com.uzum.cms.dto.response.CardResponse;
+import com.uzum.cms.entity.CardEntity;
 import com.uzum.cms.exception.CardNotFoundException;
 import com.uzum.cms.mapper.CardMapper;
 import com.uzum.cms.repository.CardRepository;
 import com.uzum.cms.service.CardService;
+import com.uzum.cms.utility.UtilitiesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import java.time.LocalDate;
+
 
 @Service
 @RequiredArgsConstructor
@@ -26,77 +28,59 @@ public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
     private final CardMapper cardMapper;
+    private final UtilitiesService utilitiesService;
 
     @Override
-    public CardDto createCard(CreateCardRequest request) {
-        Card card = cardMapper.toEntity(request);
+    @Transactional
+    public CardResponse createCard(CardRequest request) {
+        CardEntity cardEntity = cardMapper.toEntity(request);
 
-        card.setCardNumberMasked(maskCardNumber(request.cardNumberMasked()));
+        String cardNumber = utilitiesService.generateCardNumber();
 
-        card.setCardHash(generateCardHash(request.cardNumberMasked()));
+        cardEntity.setCardNumber(cardNumber);
+        cardEntity.setToken(utilitiesService.generateToken(cardNumber));
+        cardEntity.setExpiryDate(LocalDate.now().plusYears(10));
+        cardEntity.setStatus(Status.ACTIVE);
+        cardEntity.setCcv(utilitiesService.generateCcv());
 
-        card.setStatus(Status.ACTIVE);
-        Card savedCard = cardRepository.save(card);
-        log.info("Card created with ID {}", savedCard.getId());
+        CardEntity saved = cardRepository.save(cardEntity);
 
-        return cardMapper.toDto(savedCard);
+        return cardMapper.toDto(saved);
     }
 
     @Override
-    public CardDto getCardById(Long cardId) {
-        Card card = cardRepository.findById(cardId)
+    @Transactional(readOnly = true)
+    public CardResponse getCardById(Long cardId) {
+        return cardRepository.findById(cardId)
+                .map(cardMapper::toDto)
                 .orElseThrow(() -> new CardNotFoundException("Card not found"));
-        return cardMapper.toDto(card);
     }
 
+
     @Override
-    public List<CardDto> getCardByUserId(Long userId) {
-        List<Card> cards = cardRepository.findAllByUserId(userId); // returns list
-        if (cards.isEmpty()) {
+    @Transactional(readOnly = true)
+    public Page<CardResponse> getCardsByUserId(Long userId, PageRequestDto pageRequest) {
+        Pageable pageable = pageRequest.getPageable();
+
+        Page<CardEntity> cardsPage = cardRepository.findAllByUserId(userId, pageable);
+
+        if (cardsPage.isEmpty()) {
             throw new CardNotFoundException("No cards found for user with ID " + userId);
         }
-        return cards.stream()
-                .map(cardMapper::toDto)
-                .toList();
-    }
 
+        return cardsPage.map(cardMapper::toDto);
+    }
 
     @Override
-    public CardDto updateCardStatus(Long cardId, Status request) {
-        Card card = cardRepository.findById(cardId)
+    @Transactional
+    public CardResponse updateCardStatus(Long cardId, UpdateCardStatus request) {
+        CardEntity cardEntity = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException("Card not found"));
 
-        card.setStatus(request);
-        Card updatedCard = cardRepository.save(card);
-        log.info("Card ID {} status updated to {}", updatedCard.getId(), updatedCard.getStatus());
+        cardEntity.setStatus(request.status());
+        CardEntity updatedCardEntity = cardRepository.save(cardEntity);
 
-        return cardMapper.toDto(updatedCard);
-    }
-
-    private String maskCardNumber(String fullCardNumber) {
-        if (fullCardNumber == null || fullCardNumber.length() < 4) {
-            throw new CardNonValidException("Card number too short");
-        }
-        String last4 = fullCardNumber.substring(fullCardNumber.length() - 4);
-        return "**** **** **** " + last4;
-    }
-
-    private String generateCardHash(String fullCardNumber) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            String SECRET_SALT = "MySecretSalt123!";
-            String input = fullCardNumber + SECRET_SALT;
-            byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-            // Convert bytes to hex
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hashBytes) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error generating card hash", e);
-        }
+        log.info("Card ID {} status updated to {}", updatedCardEntity.getId(), updatedCardEntity.getStatus());
+        return cardMapper.toDto(updatedCardEntity);
     }
 }

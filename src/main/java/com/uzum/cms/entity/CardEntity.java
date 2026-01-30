@@ -3,7 +3,6 @@ package com.uzum.cms.entity;
 import com.uzum.cms.constant.enums.CardType;
 import com.uzum.cms.constant.enums.Status;
 import com.uzum.cms.constant.enums.UserType;
-import com.uzum.cms.dto.response.CardDto;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -15,39 +14,28 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-@SuperBuilder
 @AllArgsConstructor
-public class Card extends BaseEntity{
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+@SuperBuilder
+public class CardEntity extends BaseEntity {
 
     @Column(name = "account_id", nullable = false)
     private Long accountId;
 
-    // Masked card number for display (e.g., **** **** **** 1234)
-    @Column(name = "card_number_masked", nullable = false, length = 64)
-    private String cardNumberMasked;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-    @Column(name = "card_hash", nullable = false, length = 64, unique = true)
-    private String cardHash;
+    @Column(name = "card_number", nullable = false, length = 64)
+    private String cardNumber;
 
-    // Expiration date
+    @Column(name = "token", nullable = false, unique = true, length = 64)
+    private String token;
+
     @Column(name = "expiry_date", nullable = false)
     private LocalDate expiryDate;
 
-    // Card status: ACTIVE, BLOCKED, EXPIRED
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private Status status;
-
-    @Column(name = "account_number", nullable = false, unique = true)
-    private Long accountNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "card_type", length = 20)
@@ -57,6 +45,12 @@ public class Card extends BaseEntity{
     @Column(name = "user_type", length = 20)
     private UserType userType;
 
-    @Column(name = "token")
-    private String token;
+    @Column(name = "pin", length = 4)
+    private String pin;
+
+    @Column(name = "ccv", length = 4)
+    private String ccv;
+
+    @Column(name = "holder_name", nullable = false, length = 100)
+    private String holderName;
 }
