@@ -1,8 +1,10 @@
 package com.uzum.cms.service;
 
 import com.uzum.cms.dto.PageRequestDto;
+import com.uzum.cms.dto.event.CardEmissionEvent;
 import com.uzum.cms.dto.request.CardRequest;
 import com.uzum.cms.dto.request.UpdateCardStatus;
+import com.uzum.cms.dto.response.CardInfoResponse;
 import com.uzum.cms.dto.response.CardResponse;
 import org.springframework.data.domain.Page;
 
@@ -10,9 +12,13 @@ import java.util.List;
 
 public interface CardService {
 
-    CardResponse createCard(CardRequest request);
+    void startCardEmission(CardRequest request);
 
-    CardResponse getCardById(Long cardId);
+    CardResponse createCard(CardEmissionEvent event);
+
+    CardResponse getCardResponseById(Long cardId);
+
+    CardInfoResponse getByToken(String token);
 
     Page<CardResponse> getCardsByUserId(Long userId, PageRequestDto pageRequest);
 

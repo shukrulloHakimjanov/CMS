@@ -11,5 +11,7 @@ import java.util.Optional;
 public interface CardRepository extends JpaRepository<CardEntity, Long> {
     Optional<CardEntity> findByUserId(Long userId);
 
+    Optional<CardEntity> findByToken(String token);
+
     Page<CardEntity> findAllByUserId(Long userId, Pageable pageable);
 }
