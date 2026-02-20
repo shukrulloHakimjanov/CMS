@@ -51,10 +51,10 @@ public class CardEntity extends BaseEntity {
     @Column(columnDefinition = "card_type", nullable = false)
     private CardType cardType;
 
-    @Column(name = "pin", length = 4, nullable = false)
+    @Column(name = "pin", nullable = false)
     private String pin;
 
-    @Column(name = "cvv", length = 4, nullable = false)
+    @Column(name = "cvv", length = 3, nullable = false)
     private String cvv;
 
     @Column(name = "holder_name", nullable = false, length = 100)

@@ -24,7 +24,9 @@ public enum Error {
     ACCOUNT_USER_INVALID_CODE(10530, "Account and User don't match"),
 
     WEBHOOK_REQUEST_INVALID(10590, "Webhook request invalid"),
-    CLIENT_NOT_FOUND_CODE(10600, "Client with provided id not found");
+    CLIENT_NOT_FOUND_CODE(10600, "Client with provided id not found"),
+    ACCOUNT_VALIDATION_FAILED_CODE(10700, "Account validation failed"),
+    CARD_EXPIRED_CODE(10800, "Card expired");
 
     final int code;
     final String message;

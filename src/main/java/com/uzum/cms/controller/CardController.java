@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Currency;
+
 import static com.uzum.cms.constant.Constant.CARD_API;
 
 @RestController
@@ -47,11 +49,11 @@ public class CardController {
 
 
     @Operation(summary = "Get card details by card token")
-    @GetMapping("/by-token/{token}")
-    public ResponseEntity<CardInfoResponse> getByToken(@PathVariable String token) {
-        CardInfoResponse cardInfoResponse = cardService.getByToken(token);
+    @GetMapping("/validate/{token}/{currency}")
+    public ResponseEntity<CardInfoResponse> validateByTokenAndCurrency(@PathVariable String token, @PathVariable Currency currency) {
+        cardService.validateByTokenAndCurrency(token, currency);
 
-        return ResponseEntity.ok(cardInfoResponse);
+        return ResponseEntity.ok().build();
     }
 
 

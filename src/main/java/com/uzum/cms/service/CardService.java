@@ -8,6 +8,7 @@ import com.uzum.cms.dto.response.CardInfoResponse;
 import com.uzum.cms.dto.response.CardResponse;
 import org.springframework.data.domain.Page;
 
+import java.util.Currency;
 import java.util.List;
 
 public interface CardService {
@@ -18,7 +19,7 @@ public interface CardService {
 
     CardResponse getCardResponseById(Long cardId);
 
-    CardInfoResponse getByToken(String token);
+    void validateByTokenAndCurrency(String token, Currency currency);
 
     Page<CardResponse> getCardsByUserId(Long userId, PageRequestDto pageRequest);
 

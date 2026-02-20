@@ -38,7 +38,6 @@ spring:
   kafka:
     consumer:
       bootstrap-servers: kafka:9092
-      auto-offset-reset: earliest
 
     producer:
       bootstrap-servers: kafka:9092
@@ -57,7 +56,20 @@ server:
 logging:
   config: classpath:log4j2.yml
 
+  level:
+    org:
+      apache:
+        kafka: WARN
+      springframework:
+        kafka: WARN
 
 webhook:
   url: ${WEBHOOK_URL}
   secret: ${WEBHOOK_SECRET}
+
+service:
+  ams:
+    baseUrl: ${AMS_URL}
+
+  client:
+    baseUrl: ${CLIENT_URL}

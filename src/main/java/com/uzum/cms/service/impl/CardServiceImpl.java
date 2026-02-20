@@ -1,19 +1,21 @@
 package com.uzum.cms.service.impl;
 
+import com.uzum.cms.component.adapter.AmsAdapter;
 import com.uzum.cms.component.producer.CardEventProducer;
 import com.uzum.cms.constant.enums.Error;
 import com.uzum.cms.dto.PageRequestDto;
 import com.uzum.cms.dto.event.CardEmissionEvent;
 import com.uzum.cms.dto.request.CardRequest;
 import com.uzum.cms.dto.request.UpdateCardStatus;
-import com.uzum.cms.dto.response.AMSInfoResponse;
-import com.uzum.cms.dto.response.CardInfoResponse;
 import com.uzum.cms.dto.response.CardResponse;
 import com.uzum.cms.entity.CardEntity;
+import com.uzum.cms.exception.AccountValidationException;
+import com.uzum.cms.exception.CardExpiredException;
 import com.uzum.cms.exception.CardNotFoundException;
+import com.uzum.cms.exception.http.HttpClientException;
+import com.uzum.cms.exception.http.HttpServerException;
 import com.uzum.cms.mapper.CardMapper;
 import com.uzum.cms.repository.CardRepository;
-import com.uzum.cms.service.AmsIntegrationService;
 import com.uzum.cms.service.CardService;
 import com.uzum.cms.utility.UtilitiesService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Currency;
 
 @Slf4j
 @Service
@@ -34,7 +37,7 @@ public class CardServiceImpl implements CardService {
     private final CardMapper cardMapper;
     private final UtilitiesService utilitiesService;
     private final CardEventProducer cardEventProducer;
-    private final AmsIntegrationService amsIntegrationService;
+    private final AmsAdapter amsAdapter;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -73,12 +76,18 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional(readOnly = true)
-    public CardInfoResponse getByToken(final String token) {
+    public void validateByTokenAndCurrency(final String token, final Currency currency) {
         CardEntity cardEntity = cardRepository.findByToken(token).orElseThrow(() -> new CardNotFoundException(Error.CARD_NOT_FOUND_CODE));
 
-        AMSInfoResponse amsInfoResponse = amsIntegrationService.fetchAccountInfoById(cardEntity.getAccountId());
+        if (!cardEntity.getExpiryDate().isAfter(LocalDate.now())) {
+            throw new CardExpiredException(Error.CARD_EXPIRED_CODE);
+        }
 
-        return cardMapper.entityToCardInfoResponse(cardEntity, amsInfoResponse);
+        try {
+            amsAdapter.validateAccountByIdAndCurrency(cardEntity.getAccountId(), currency);
+        } catch (HttpClientException | HttpServerException ex) {
+            throw new AccountValidationException(Error.ACCOUNT_VALIDATION_FAILED_CODE);
+        }
     }
 
     @Override

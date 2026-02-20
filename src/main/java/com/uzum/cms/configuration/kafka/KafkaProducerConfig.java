@@ -2,7 +2,7 @@ package com.uzum.cms.configuration.kafka;
 
 import com.uzum.cms.configuration.property.KafkaProperties;
 import com.uzum.cms.dto.event.CardEmissionEvent;
-import com.uzum.cms.dto.event.WebhookEvent;
+import com.uzum.cms.dto.event.CardTerminalStateEvent;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
@@ -45,7 +45,7 @@ public class KafkaProducerConfig {
                 Map.of(
                     byte[].class, new ByteArraySerializer(),
                     CardEmissionEvent.class, new JacksonJsonSerializer<>(),
-                    WebhookEvent.class, new JacksonJsonSerializer<>()
+                    CardTerminalStateEvent.class, new JacksonJsonSerializer<>()
                 )));
 
         return new KafkaTemplate<>(factory);

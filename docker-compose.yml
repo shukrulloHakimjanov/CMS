@@ -56,18 +56,24 @@ services:
     ports:
       - "7070:7070"
     environment:
+
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/card_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root_password
 
-      WEBHOOK_URL: ""
+      WEBHOOK_URL: ${WEBHOOK_URL}
       WEBHOOK_SECRET: ${WEBHOOK_SECRET}
 
       SHOW_SQL: true
 
       JAVA_OPTS: "-Xms256m -Xmx512m"
 
+      AMS_URL: ${AMS_URL}
+      CLIENT_URL: ${CLIENT_URL}
+
     restart: unless-stopped
 
 volumes:
-  postgres_data: {}
+  postgres_data: { }

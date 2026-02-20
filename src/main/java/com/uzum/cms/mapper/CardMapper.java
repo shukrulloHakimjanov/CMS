@@ -3,14 +3,10 @@ package com.uzum.cms.mapper;
 
 import com.uzum.cms.dto.event.CardEmissionEvent;
 import com.uzum.cms.dto.request.CardRequest;
-import com.uzum.cms.dto.response.AMSInfoResponse;
-import com.uzum.cms.dto.response.CardInfoResponse;
 import com.uzum.cms.dto.response.CardResponse;
 import com.uzum.cms.entity.CardEntity;
-import com.uzum.cms.utility.UtilitiesService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 
@@ -32,11 +28,4 @@ public interface CardMapper {
 
     @Mapping(target = "pinEncrypted", source = "pinEncrypted")
     CardEmissionEvent requestToEvent(CardRequest request, String pinEncrypted);
-
-    @Mapping(target = "id", source = "entity.id")
-    @Mapping(target = "accountId", source = "amsInfoResponse.id")
-    @Mapping(target = "accountStatus", source = "amsInfoResponse.status")
-    @Mapping(target = "currency", source = "amsInfoResponse.currency")
-    @Mapping(target = "cardExpireDate", source = "entity.expiryDate")
-    CardInfoResponse entityToCardInfoResponse(CardEntity entity, AMSInfoResponse amsInfoResponse);
 }

@@ -11,8 +11,8 @@ public class KafkaConstants {
     public static final String CARD_CREATION_GROUP = "cards.emission.creation.group";
 
 
-    public static final String WEBHOOK_TOPIC = "cards.webhook";
-    public static final String WEBHOOK_GROUP = "cards.webhook.group";
+    public static final String TERMINAL_STATE_TOPIC = "cards.terminal-state";
+    public static final String TERMINAL_STATE_GROUP = "cards.terminal-state.group";
 
     public static final String TRUSTED_PACKAGE = "com.uzum.cms.dto.event";
 }

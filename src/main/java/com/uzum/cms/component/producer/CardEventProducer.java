@@ -2,6 +2,7 @@ package com.uzum.cms.component.producer;
 
 import com.uzum.cms.constant.KafkaConstants;
 import com.uzum.cms.dto.event.CardEmissionEvent;
+import com.uzum.cms.dto.event.CardTerminalStateEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -21,5 +22,9 @@ public class CardEventProducer {
 
     public void publishForCardCreation(final CardEmissionEvent event) {
         kafkaTemplate.send(KafkaConstants.CARD_CREATION_TOPIC, event);
+    }
+
+    public void publishForCardForTerminalStatus(final CardTerminalStateEvent event) {
+        kafkaTemplate.send(KafkaConstants.TERMINAL_STATE_TOPIC, event);
     }
 }

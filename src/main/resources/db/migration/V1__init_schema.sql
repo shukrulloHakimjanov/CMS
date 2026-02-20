@@ -13,8 +13,8 @@ CREATE TYPE card_network_type AS ENUM (
 );
 
 CREATE TYPE card_type AS ENUM (
-    'INDIVIDUAL',
-    'LLC'
+    'PERSONAL',
+    'CORPORATE'
 );
 
 CREATE TABLE cards (
@@ -27,7 +27,7 @@ CREATE TABLE cards (
     status card_status NOT NULL DEFAULT 'ACTIVE',
     card_network_type card_network_type NOT NULL,
     card_type card_type NOT NULL,
-    pin varchar(4) NOT NULL,
+    pin varchar(255) NOT NULL,
     cvv varchar(3) NOT NULL,
     holder_name varchar(255) NOT NULL,
     created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
