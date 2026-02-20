@@ -1,22 +1,31 @@
 package com.uzum.cms.mapper;
 
 
+import com.uzum.cms.dto.event.CardEmissionEvent;
 import com.uzum.cms.dto.request.CardRequest;
 import com.uzum.cms.dto.response.CardResponse;
 import com.uzum.cms.entity.CardEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.time.LocalDate;
+
 @Mapper(componentModel = "spring")
 public interface CardMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "cardNumber", ignore = true)
-    @Mapping(target = "token", ignore = true)
-    @Mapping(target = "expiryDate", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    @Mapping(target = "ccv", ignore = true)
-    CardEntity toEntity(CardRequest request);
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "cardNumber", source = "cardNumber")
+    @Mapping(target = "token", source = "token")
+    @Mapping(target = "expiryDate", source = "expiryDate")
+    @Mapping(target = "status", constant = "ACTIVE")
+    @Mapping(target = "pin", source = "event.pinEncrypted")
+    @Mapping(target = "cvv", source = "cvv")
+    CardEntity toEntity(CardEmissionEvent event, String cardNumber, String cvv, String token, LocalDate expiryDate);
 
     CardResponse toDto(CardEntity entity);
+
+    @Mapping(target = "pinEncrypted", source = "pinEncrypted")
+    CardEmissionEvent requestToEvent(CardRequest request, String pinEncrypted);
 }

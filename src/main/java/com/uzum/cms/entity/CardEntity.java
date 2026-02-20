@@ -1,28 +1,31 @@
 package com.uzum.cms.entity;
 
+import com.uzum.cms.constant.enums.CardNetworkType;
 import com.uzum.cms.constant.enums.CardType;
 import com.uzum.cms.constant.enums.Status;
-import com.uzum.cms.constant.enums.UserType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
-@Table(name = "cards")
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
+@Table(name = "cards")
 public class CardEntity extends BaseEntity {
 
     @Column(name = "account_id", nullable = false)
-    private Long accountId;
+    private UUID accountId;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private UUID userId;
 
     @Column(name = "card_number", nullable = false, length = 64)
     private String cardNumber;
@@ -34,22 +37,25 @@ public class CardEntity extends BaseEntity {
     private LocalDate expiryDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "status", nullable = false)
     private Status status;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "card_type", length = 20)
-    private CardType cardType;
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "card_network_type", nullable = false)
+    private CardNetworkType cardNetworkType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_type", length = 20)
-    private UserType userType;
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(columnDefinition = "card_type", nullable = false)
+    private CardType cardType;
 
-    @Column(name = "pin", length = 4)
+    @Column(name = "pin", nullable = false)
     private String pin;
 
-    @Column(name = "ccv", length = 4)
-    private String ccv;
+    @Column(name = "cvv", length = 3, nullable = false)
+    private String cvv;
 
     @Column(name = "holder_name", nullable = false, length = 100)
     private String holderName;

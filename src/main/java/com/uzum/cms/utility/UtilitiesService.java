@@ -1,15 +1,18 @@
 package com.uzum.cms.utility;
 
-import com.uzum.cms.exception.CardNonValidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.UUID;
 
 
 @Service
 @RequiredArgsConstructor
 public class UtilitiesService {
+    private final SecureRandom secureRandom;
+
     public String generateCardNumber() {
         String prefix = "0820";
         StringBuilder sb = new StringBuilder(prefix);
@@ -28,9 +31,14 @@ public class UtilitiesService {
         return UUID.nameUUIDFromBytes(cardNumber.getBytes()).toString();
     }
 
-    public String generateCcv() {
-        int ccv = (int) (Math.random() * 900) + 100;
-        return String.valueOf(ccv);
+    public String generateCvv() {
+        int cvv = secureRandom.nextInt(900) + 100;
+        return String.valueOf(cvv);
+    }
+
+
+    public LocalDate generateExpiryDate() {
+        return LocalDate.now().plusYears(10);
     }
 
 }

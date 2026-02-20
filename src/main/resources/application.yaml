@@ -5,21 +5,26 @@ spring:
 
   # JPA configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/card
-
-    username: user
-    password: 123
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     tomcat:
       test-on-borrow: true
       validation-query: SELECT 1
+    hikari:
+      maximum-pool-size: 16
+      minimum-idle: 8
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
-    show-sql: ${SHOW_SQL:false}
+    show-sql: true
     properties:
       hibernate:
         jdbc:
@@ -28,12 +33,43 @@ spring:
         order_inserts: true
         format_sql: true
         generate_statistics: true
-        default_schema: public
+        default_schema: postgres
 
-  # Flyway configuration
+  kafka:
+    consumer:
+      bootstrap-servers: kafka:9092
+
+    producer:
+      bootstrap-servers: kafka:9092
+      acks: -1
+
   flyway:
-    baseline-on-migrate: true
     enabled: true
+    baseline-on-migrate: true
     validate-on-migrate: true
     baseline-version: 0
     schemas: postgres
+
+server:
+  port: 7070
+
+logging:
+  config: classpath:log4j2.yml
+
+  level:
+    org:
+      apache:
+        kafka: WARN
+      springframework:
+        kafka: WARN
+
+webhook:
+  url: ${WEBHOOK_URL}
+  secret: ${WEBHOOK_SECRET}
+
+service:
+  ams:
+    baseUrl: ${AMS_URL}
+
+  client:
+    baseUrl: ${CLIENT_URL}

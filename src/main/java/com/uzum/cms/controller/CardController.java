@@ -3,6 +3,7 @@ package com.uzum.cms.controller;
 import com.uzum.cms.dto.PageRequestDto;
 import com.uzum.cms.dto.request.CardRequest;
 import com.uzum.cms.dto.request.UpdateCardStatus;
+import com.uzum.cms.dto.response.CardInfoResponse;
 import com.uzum.cms.dto.response.CardResponse;
 import com.uzum.cms.service.CardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,9 +12,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Currency;
 
 import static com.uzum.cms.constant.Constant.CARD_API;
 
@@ -31,14 +35,27 @@ public class CardController {
     @PostMapping
     public ResponseEntity<CardResponse> createCard(@Valid @RequestBody CardRequest request) {
         log.info("Create card request received");
-        return ResponseEntity.ok(cardService.createCard(request));
+
+        cardService.startCardEmission(request);
+
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @Operation(summary = "Get card details by card ID")
     @GetMapping("/{cardId}")
     public ResponseEntity<CardResponse> getCardById(@PathVariable Long cardId) {
-        return ResponseEntity.ok(cardService.getCardById(cardId));
+        return ResponseEntity.ok(cardService.getCardResponseById(cardId));
     }
+
+
+    @Operation(summary = "Get card details by card token")
+    @GetMapping("/validate/{token}/{currency}")
+    public ResponseEntity<CardInfoResponse> validateByTokenAndCurrency(@PathVariable String token, @PathVariable Currency currency) {
+        cardService.validateByTokenAndCurrency(token, currency);
+
+        return ResponseEntity.ok().build();
+    }
+
 
     @Operation(summary = "Update card status")
     @PatchMapping("/{cardId}/status")
@@ -48,11 +65,7 @@ public class CardController {
 
     @Operation(summary = "Get all cards for a user")
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<CardResponse>> getCardsByUserId(
-            @PathVariable Long userId,
-            PageRequestDto pageRequest
-    ) {
+    public ResponseEntity<Page<CardResponse>> getCardsByUserId(@PathVariable Long userId, PageRequestDto pageRequest) {
         return ResponseEntity.ok(cardService.getCardsByUserId(userId, pageRequest));
     }
-
 }
