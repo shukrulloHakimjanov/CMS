@@ -4,6 +4,7 @@ import com.uzum.cms.dto.PageRequestDto;
 import com.uzum.cms.dto.event.CardEmissionEvent;
 import com.uzum.cms.dto.request.CardRequest;
 import com.uzum.cms.dto.request.UpdateCardStatus;
+import com.uzum.cms.dto.response.CardAccountResponse;
 import com.uzum.cms.dto.response.CardInfoResponse;
 import com.uzum.cms.dto.response.CardResponse;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,7 @@ public interface CardService {
 
     CardResponse getCardResponseById(Long cardId);
 
-    void validateByTokenAndCurrency(String token, Currency currency);
+    CardAccountResponse getByTokenAndCurrency(final String token, final Currency currency);
 
     Page<CardResponse> getCardsByUserId(Long userId, PageRequestDto pageRequest);
 
