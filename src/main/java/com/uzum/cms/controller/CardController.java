@@ -3,6 +3,7 @@ package com.uzum.cms.controller;
 import com.uzum.cms.dto.PageRequestDto;
 import com.uzum.cms.dto.request.CardRequest;
 import com.uzum.cms.dto.request.UpdateCardStatus;
+import com.uzum.cms.dto.response.CardAccountResponse;
 import com.uzum.cms.dto.response.CardInfoResponse;
 import com.uzum.cms.dto.response.CardResponse;
 import com.uzum.cms.service.CardService;
@@ -50,10 +51,10 @@ public class CardController {
 
     @Operation(summary = "Get card details by card token")
     @GetMapping("/validate/{token}/{currency}")
-    public ResponseEntity<CardInfoResponse> validateByTokenAndCurrency(@PathVariable String token, @PathVariable Currency currency) {
-        cardService.validateByTokenAndCurrency(token, currency);
+    public ResponseEntity<CardAccountResponse> validateByTokenAndCurrency(@PathVariable String token, @PathVariable Currency currency) {
+        CardAccountResponse response = cardService.getByTokenAndCurrency(token, currency);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
 
 

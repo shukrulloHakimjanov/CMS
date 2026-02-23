@@ -7,6 +7,7 @@ import com.uzum.cms.dto.PageRequestDto;
 import com.uzum.cms.dto.event.CardEmissionEvent;
 import com.uzum.cms.dto.request.CardRequest;
 import com.uzum.cms.dto.request.UpdateCardStatus;
+import com.uzum.cms.dto.response.CardAccountResponse;
 import com.uzum.cms.dto.response.CardResponse;
 import com.uzum.cms.entity.CardEntity;
 import com.uzum.cms.exception.AccountValidationException;
@@ -76,7 +77,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional(readOnly = true)
-    public void validateByTokenAndCurrency(final String token, final Currency currency) {
+    public CardAccountResponse getByTokenAndCurrency(final String token, final Currency currency) {
         CardEntity cardEntity = cardRepository.findByToken(token).orElseThrow(() -> new CardNotFoundException(Error.CARD_NOT_FOUND_CODE));
 
         if (!cardEntity.getExpiryDate().isAfter(LocalDate.now())) {
@@ -88,6 +89,8 @@ public class CardServiceImpl implements CardService {
         } catch (HttpClientException | HttpServerException ex) {
             throw new AccountValidationException(Error.ACCOUNT_VALIDATION_FAILED_CODE);
         }
+
+        return new CardAccountResponse(cardEntity.getAccountId());
     }
 
     @Override
