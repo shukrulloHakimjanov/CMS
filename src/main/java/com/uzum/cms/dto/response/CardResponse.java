@@ -8,12 +8,13 @@ import java.util.UUID;
 
 public record CardResponse(
 
-        Long id,
+        UUID id,
         UUID accountId,
         UUID userId,
         String cardNumber,
         String holderName,
         CardType cardType,
+        String token,
         Status status,
         LocalDate expiryDate
 ) {}

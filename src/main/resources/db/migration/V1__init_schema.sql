@@ -18,7 +18,7 @@ CREATE TYPE card_type AS ENUM (
 );
 
 CREATE TABLE cards (
-    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     account_id UUID NOT NULL,
     user_id UUID NOT NULL,
     card_number varchar(64) NOT NULL UNIQUE,
